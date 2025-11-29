@@ -17,7 +17,7 @@ public class Artista
     public List<Disco> Discos { get; set; } = new List<Disco>();
 
     // Constructor vacío (Requerido por EF Core)
-    public Artista() { }
+    // public Artista() { }
 
     // Constructor con parámetros (Para tu uso manual)
     public Artista(int id, string nombreCompleto, string nombreArtistico, int anioInicio, string nacionalidad, string discografica)

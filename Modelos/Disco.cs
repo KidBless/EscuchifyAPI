@@ -15,7 +15,7 @@ public class Disco
     public List<Cancion> Canciones { get; set; } = new List<Cancion>();
 
     // Constructor vacío requerido por EF Core
-    public Disco() { }
+    // public Disco() { }
 
     public Disco(int id, string titulo, int anioLanzamiento, string tipoDisco)
     {
