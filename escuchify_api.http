@@ -1,6 +1,13 @@
-@escuchify_api_HostAddress = http://localhost:5126
+@HostAddress = http://localhost:5126
 
-GET {{escuchify_api_HostAddress}}/weatherforecast/
-Accept: application/json
+### Crear un Artista de prueba
+POST {{HostAddress}}/api/Artistas
+Content-Type: application/json
 
-###
+{
+  "nombreCompleto": "Gustavo Cerati",
+  "nombreArtistico": "Cerati",
+  "anioInicio": 1982,
+  "nacionalidad": "Argentina",
+  "discografica": "Sony Music"
+}
