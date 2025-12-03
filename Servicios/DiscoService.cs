@@ -1,65 +1,76 @@
 using escuchify_api.Modelos;
+using escuchify_api.Modelos.Dtos;
 using escuchify_api.Repositorios;
+using Microsoft.EntityFrameworkCore; // Necesario para Include si usas EF directo o Repository
 
 namespace escuchify_api.Servicios;
 
 public class DiscoService
 {
     private readonly IDiscoRepository _discoRepository;
-    private readonly IArtistaRepository _artistaRepository; // Necesario para validar que el artista exista
+    private readonly IArtistaRepository _artistaRepository;
+    private readonly SpotifyService _spotify;
 
-    public DiscoService(IDiscoRepository discoRepository, IArtistaRepository artistaRepository)
+    public DiscoService(IDiscoRepository discoRepository, IArtistaRepository artistaRepository, SpotifyService spotify)
     {
         _discoRepository = discoRepository;
         _artistaRepository = artistaRepository;
+        _spotify = spotify;
     }
 
-    public List<Disco> ObtenerTodos()
+    public List<Disco> ObtenerTodos() => _discoRepository.ObtenerTodos();
+    
+    public Disco? ObtenerPorId(int id) => _discoRepository.ObtenerPorId(id);
+
+    public async Task<SpotifyDiscoDto?> BuscarDatosEnSpotify(string titulo, int artistaId)
     {
-        return _discoRepository.ObtenerTodos();
+        var artista = _artistaRepository.ObtenerPorId(artistaId);
+        string nombreArtista = artista?.NombreArtistico ?? "";
+        return await _spotify.BuscarInfoDisco(titulo, nombreArtista);
     }
 
-    public Disco? ObtenerPorId(int id)
+    public async Task CrearDisco(Disco disco)
     {
-        return _discoRepository.ObtenerPorId(id);
-    }
-
-    public void CrearDisco(Disco disco)
-    {
-        if (string.IsNullOrWhiteSpace(disco.Titulo))
-            throw new ArgumentException("El título del disco es obligatorio.");
-
-        if (disco.AnioLanzamiento < 1800 || disco.AnioLanzamiento > DateTime.Now.Year + 1)
-             throw new ArgumentException("El año de lanzamiento no es válido.");
+        // Validaciones básicas
+        if (string.IsNullOrWhiteSpace(disco.Titulo)) throw new ArgumentException("El título es obligatorio.");
         
-        // Validación: El Artista debe existir
-        var artista = _artistaRepository.ObtenerPorId(disco.ArtistaId);
-        if (artista == null)
-            throw new ArgumentException($"El artista con ID {disco.ArtistaId} no existe.");
+        // Si no tiene imagen, intentamos buscarla automáticamente (opcional)
+        if (string.IsNullOrEmpty(disco.ImagenUrl))
+        {
+            try 
+            {
+                var info = await BuscarDatosEnSpotify(disco.Titulo, disco.ArtistaId);
+                if (info != null)
+                {
+                    disco.ImagenUrl = info.ImagenUrl;
+                    if (disco.AnioLanzamiento == 0) disco.AnioLanzamiento = info.AnioLanzamiento;
+                    if (string.IsNullOrEmpty(disco.TipoDisco)) disco.TipoDisco = info.TipoDisco;
+                }
+            }
+            catch { /* Continuar sin error si falla Spotify */ }
+        }
 
         _discoRepository.Crear(disco);
     }
 
-    public void ActualizarDisco(int id, Disco discoActualizado)
+    public void ActualizarDisco(int id, Disco disco)
     {
-        var discoExistente = _discoRepository.ObtenerPorId(id);
-        if (discoExistente == null)
-            throw new KeyNotFoundException($"Disco con ID {id} no encontrado.");
+        // Lógica de actualización (usar repositorio)
+        var existente = _discoRepository.ObtenerPorId(id);
+        if (existente == null) throw new KeyNotFoundException("Disco no encontrado");
+        
+        existente.Titulo = disco.Titulo;
+        existente.AnioLanzamiento = disco.AnioLanzamiento;
+        existente.TipoDisco = disco.TipoDisco;
+        existente.ArtistaId = disco.ArtistaId;
+        if(!string.IsNullOrEmpty(disco.ImagenUrl)) existente.ImagenUrl = disco.ImagenUrl;
 
-        discoExistente.Titulo = discoActualizado.Titulo;
-        discoExistente.AnioLanzamiento = discoActualizado.AnioLanzamiento;
-        discoExistente.TipoDisco = discoActualizado.TipoDisco;
-        // Si permites cambiar de artista, valida de nuevo el ArtistaId aquí.
-
-        _discoRepository.Actualizar(discoExistente);
+        _discoRepository.Actualizar(existente);
     }
 
     public void EliminarDisco(int id)
     {
         var disco = _discoRepository.ObtenerPorId(id);
-        if (disco != null)
-        {
-            _discoRepository.Eliminar(disco);
-        }
+        if (disco != null) _discoRepository.Eliminar(disco);
     }
-} 
+}

@@ -10,6 +10,7 @@ public class Artista
     public int AnioInicio { get; set; }
     public string Nacionalidad { get; set; }
     public string Discografica { get; set; }
+    public string? ImagenUrl { get; set; }
 
     // --- RELACIÓN IMPORTANTE ---
     // Esta lista permite que un Artista tenga muchos Discos.

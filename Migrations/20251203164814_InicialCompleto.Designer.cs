@@ -10,8 +10,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace escuchify_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20251128143705_InicialPostgres")]
-    partial class InicialPostgres
+    [Migration("20251203164814_InicialCompleto")]
+    partial class InicialCompleto
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -36,6 +36,9 @@ namespace escuchify_api.Migrations
 
                     b.Property<string>("Discografica")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ImagenUrl")
                         .HasColumnType("text");
 
                     b.Property<string>("Nacionalidad")

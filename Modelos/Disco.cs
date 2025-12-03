@@ -7,15 +7,16 @@ public class Disco
     public int AnioLanzamiento { get; set; }
     public string TipoDisco { get; set; }
 
-    // --- AGREGAR ESTO (Relación con Artista) ---
-    public int ArtistaId { get; set; } // La clave foránea
-    public Artista? Artista { get; set; } // La navegación
-    // ------------------------------------------
+    // Relación con Artista
+    public int ArtistaId { get; set; }
+    public Artista? Artista { get; set; }
 
     public List<Cancion> Canciones { get; set; } = new List<Cancion>();
 
-    // Constructor vacío requerido por EF Core
-    // public Disco() { }
+    // Campo nuevo para la portada
+    public string? ImagenUrl { get; set; }
+
+    public Disco() { }
 
     public Disco(int id, string titulo, int anioLanzamiento, string tipoDisco)
     {

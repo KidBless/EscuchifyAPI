@@ -6,7 +6,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace escuchify_api.Migrations
 {
     /// <inheritdoc />
-    public partial class InicialPostgres : Migration
+    public partial class InicialCompleto : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,8 @@ namespace escuchify_api.Migrations
                     NombreArtistico = table.Column<string>(type: "text", nullable: false),
                     AnioInicio = table.Column<int>(type: "integer", nullable: false),
                     Nacionalidad = table.Column<string>(type: "text", nullable: false),
-                    Discografica = table.Column<string>(type: "text", nullable: false)
+                    Discografica = table.Column<string>(type: "text", nullable: false),
+                    ImagenUrl = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

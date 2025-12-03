@@ -19,9 +19,10 @@ builder.Services.AddScoped<IArtistaRepository, ArtistaRepository>();
 builder.Services.AddScoped<IDiscoRepository, DiscoRepository>();
 builder.Services.AddScoped<ICancionRepository, CancionRepository>();
 
-builder.Services.AddScoped<ArtistaService>();
+builder.Services.AddScoped<IArtistaService, ArtistaService>();
 builder.Services.AddScoped<DiscoService>();
 builder.Services.AddScoped<CancionService>();
+builder.Services.AddHttpClient<SpotifyService>();
 
 // 3. Configurar CORS
 builder.Services.AddCors(options =>

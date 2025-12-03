@@ -29,12 +29,25 @@ public class DiscosController : ControllerBase
         return Ok(disco);
     }
 
+    [HttpGet("buscar-info")]
+    public async Task<IActionResult> BuscarInfo([FromQuery] string titulo, [FromQuery] int artistaId)
+    {
+        if (string.IsNullOrWhiteSpace(titulo) || artistaId <= 0)
+            return BadRequest("Faltan datos.");
+
+        var info = await _service.BuscarDatosEnSpotify(titulo, artistaId);
+        
+        if (info == null) return NotFound("No se encontró en Spotify.");
+        
+        return Ok(info);
+    }
+
     [HttpPost]
-    public IActionResult Crear([FromBody] Disco disco)
+    public async Task<IActionResult> Crear([FromBody] Disco disco)
     {
         try
         {
-            _service.CrearDisco(disco);
+            await _service.CrearDisco(disco);
             return CreatedAtAction(nameof(ObtenerPorId), new { id = disco.Id }, disco);
         }
         catch (ArgumentException ex)
@@ -53,7 +66,7 @@ public class DiscosController : ControllerBase
         }
         catch (KeyNotFoundException)
         {
-            return NotFound("Disco no encontrado para actualizar.");
+            return NotFound("Disco no encontrado.");
         }
     }
 
